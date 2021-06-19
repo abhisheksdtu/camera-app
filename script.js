@@ -1,86 +1,78 @@
-// let allConstraints = navigator.MediaDevices.getSupportedConstraints()
-// console.log('constraints', allConstraints);
+let videoPlayer = document.getElementById('video-elem');
 
-// CREATE
-let videoElem = document.querySelector('#video-elem');
-// let audioElem = document.querySelector('audio');
-let videoRecorder = document.querySelector('#record-video');
-let captureBtn = document.querySelector('#capture');
+let videoRecordBtn = document.getElementById('record-video');
 
-let constraints = {
-	video: true,
-	audio: true,
-};
-let mediaRecorder;
-let buffer = [];
+let constraints = { audio: true, video: true };
+
 let recordState = false;
+videoRecordBtn.addEventListener('click', function () {
+	if (mediaRecorder != undefined) {
+		if (recordState == false) {
+			recordState = true;
 
-// LOCAL MACHINE
+			// STARTS RECORDING
+			mediaRecorder.start();
+			// WHEN RECORDING IS STARTED WE NEED TO CATCH THIS DATA
+			// THE DATA IS SENT INTO BLOB TYPE
+			// THIS DATA IS NOT SENT ALL AT ONCE
+			// SO THE BROWSER SENDS DATA IN TIME INTERVALS IN CHUNKS SO WE STORE IT IN AN ARRAY
+			// AND WE NEED TO COMBINE THIS DATA INTO ONE
+
+			videoRecordBtn.innerText = 'Recording...';
+		} else {
+			recordState = false;
+
+			// STOPS RECORDING
+			mediaRecorder.stop();
+
+			videoRecordBtn.innerText = 'Record';
+		}
+	}
+});
+
+let chunks = [];
+
+let mediaRecorder;
+
 navigator.mediaDevices
 	.getUserMedia(constraints)
 	.then(function (mediaStream) {
-		// FEED
-		videoElem.srcObject = mediaStream;
-		// audioElem.srcObject = mediaStream;
+		// audioPlayer.srcObject = mediaStream;
+		videoPlayer.srcObject = mediaStream;
 
-		// GIVES A NEW OBJECT
+		// CREATED A MediaRecorder OBJECT IN WHICH WE PASS THE MEDIA STREAM FOR RECORDING
 		mediaRecorder = new MediaRecorder(mediaStream);
 
-		mediaRecorder.addEventListener('dataavailable', function (e) {
-			buffer.push(e.data);
-		});
+		// EVERY WE GET CHUNK OF DATA WE PUSH IT IN chunks ARRAY
+		mediaRecorder.ondataavailable = function (e) {
+			chunks.push(e.data);
+		};
 
-		mediaRecorder.addEventListener('stop', function (e) {
-			// CONVERT THAT DATA INTO A BLOB
-			// MIME TYPE
-			let blob = new Blob(buffer, { type: 'video/mp4' });
-			// CONVERT BLOB TO URL
-			const url = window.URL.createObjectURL(blob);
-			// DOWNLOAD BUTTON
-			let a = document.createElement('a');
-			// DOWNLOAD
-			a.download = 'file.mp4';
-			a.href = url;
-			a.click();
-			buffer = [];
-		});
+		// WHEN THE CHUNK OF DATA STOPS COMING
+		mediaRecorder.onstop = function () {
+			// CREATE A NEW BLOB FROM CHUNKS
+			let blob = new Blob(chunks, { type: 'video/mp4' });
+
+			// EMPTY CHUNKS
+			chunks = [];
+
+			// DOWNLOAD THIS BLOB FILE
+
+			// CREATE A BLOB URL
+			let blobUrl = URL.createObjectURL(blob);
+
+			// CREATE LINK
+			let link = document.createElement('a');
+			// ADD HREF
+			link.href = blobUrl;
+			// GIVE FILE A NAME FOR DOWNLOADING
+			link.download = 'video.mp4';
+			// CLICK THE LINK
+			link.click();
+			// REMOVE THE ANCHOR ELEM
+			link.remove();
+		};
 	})
 	.catch(function (err) {
 		console.log(err);
 	});
-
-videoRecorder.addEventListener('click', function () {
-	if (!mediaRecorder) {
-		alert('First allow permission');
-	}
-
-	if (recordState == false) {
-		mediaRecorder.start();
-		videoRecorder.innerHTML = 'Recording....';
-		recordState = true;
-	} else {
-		mediaRecorder.stop();
-		videoRecorder.innerHTML = 'Record....';
-		recordState = false;
-	}
-});
-
-captureBtn.addEventListener('click', function () {
-	// CREATE A CANVAS ELEMENT EQUAL TO DIMENSIONS OF VIDEO FRAME
-	let canvas = document.createElement('canvas');
-	canvas.width = videoElem.videoWidth;
-	canvas.height = videoElem.videoHeight;
-
-	let tool = canvas.getContext('2d');
-
-	// DRAWING A FRAME ON THE CANVAS
-	tool.drawImage(videoElem, 0, 0);
-	// CONVERT CANVAS toDataURL
-	let link = canvas.toDataURL();
-	// DOWNLOAD
-	let anchor = document.createElement('a');
-	anchor.href = link;
-	anchor.download = 'file.jpg';
-	anchor.click();
-	anchor.remove();
-});

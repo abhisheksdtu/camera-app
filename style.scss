@@ -10,24 +10,27 @@ body {
 		height: 100vh;
 		width: 100vw;
 		background-color: #000;
+		overflow: hidden;
 
 		.video {
 			height: 100%;
 			width: 100%;
 		}
 	}
-	.capture-btn,
+
+	// .capture-btn,
 	.record-btn {
 		height: 5rem;
 		width: 5rem;
 		border-radius: 50%;
 		z-index: 2;
 		position: fixed;
+		border: none;
 		top: 34vh;
 		right: 4vw;
 	}
 
-	.capture-btn {
-		top: 55vh;
-	}
+	// .capture-btn {
+	// 	top: 55vh;
+	// }
 }
