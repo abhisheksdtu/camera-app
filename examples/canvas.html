@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Canvas</title>
+        <style>
+            body {
+                margin: 0;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+
+    <body>
+        <canvas id="board"></canvas>
+
+        <script>
+            let canvas = document.getElementById('board');
+
+            // SET HEIGHT AND WIDTH OF CANVAS EQUAL TO BROWSER WINDOW'S INNER HEIGHT & INNER WIDTH
+            canvas.height = window.innerHeight;
+            canvas.width = window.innerWidth;
+
+            // GET 2D CONTEXT OF CANVAS
+            const tool = canvas.getContext('2d');
+
+            //----------------------------------------------------------------------------------------
+            /*
+            // USED TO CREATE A RECTANGLE ON CANVAS
+            // PARAMETERS - x, y, width, height
+            // fillRect WILL BASICALLY GIVE A FILLED RECTANGLE OF SPECIFIED COLOR
+            // DEFAULT COLOR OF THE RECT -> BLACK
+            tool.fillRect(10, 10, canvas.width / 2, canvas.height / 2);
+
+            // TO CHANGE COLOR USE fillStyle
+            tool.fillStyle = 'green';
+            */
+            //----------------------------------------------------------------------------------------
+
+            //----------------------------------------------------------------------------------------
+            /*
+            tool.fillStyle = 'green';
+            tool.fillRect(10, 10, canvas.width / 2, canvas.height / 2);
+
+            // THIS NEW RECT WILL OVERLAP THE PREVIOUS RECT OF GREEN COLOR
+            tool.fillStyle = 'red';
+            tool.fillRect(40, 40, canvas.width / 2, canvas.height / 2);
+            */
+            //----------------------------------------------------------------------------------------
+
+            //----------------------------------------------------------------------------------------
+            /*
+            // strokeRect WILL GIVE A HOLLOW RECT WITH STROKE OF SPECIFIED COLOR
+            tool.strokeStyle = 'red';
+            // LINE WIDTH SPECIFIES THE WIDTH OF THE STROKE
+            tool.lineWidth = 10;
+            tool.strokeRect(40, 40, canvas.width / 2, canvas.height / 2);
+            */
+            //----------------------------------------------------------------------------------------
+
+            //----------------------------------------------------------------------------------------
+            
+            /*
+            // beginPath() — start drawing a path at the point where the pen currently is on the canvas.On a new canvas, the pen starts out at(0, 0).
+            
+            // moveTo() — move the pen to a different point on the canvas, without recording or tracing the line; the pen "jumps" to the new position.
+            
+            // fill() — draw a filled shape by filling in the path you've traced so far.
+            
+            // stroke() — draw an outline shape by drawing a stroke along the path you've drawn so far.
+            
+            // You can also use features like lineWidth and fillStyle / strokeStyle with paths as well as rectangles.
+            
+            // CREATING A LINE
+            
+            // FOR STARTING A LINE WE USE beginPath 
+            // THIS FN STARTS A PATH FROM ORIGIN OF THE CANVAS
+            tool.beginPath();
+            
+            // IN CASE WE DON'T HAVE TO START LINE FROM ORIGIN RATHER AT SOME OTHER POINT THEN WE HAVE TO MOVE TO THAT POINT
+            // FOR THIS WE USE moveTo FN
+            tool.moveTo(20, 20);
+            
+            // FOR CREATING A LINE WE USE FN lineTo 
+            // THIS FN CREATES A LINE FROM 20,20 TO 500 ,500
+            // BUT THIS LINE WON'T BE RENDERED ON BROWSER
+            tool.lineTo(500, 500);
+            
+            // DEFAULT COLOR OF THE LINE IS BLACK
+            
+            // FOR CHANGING THE COLOR OF THE LINE WE USE strokeStyle FN
+            tool.strokeStyle = 'red';
+            
+            // FOR LINE WIDTH USE lineWidth FN
+            tool.lineWidth = 10;
+            
+            // FOR CREATING THIS LINE WE HAVE TO USE stroke FN
+            tool.stroke();
+            */
+           
+           //----------------------------------------------------------------------------------------
+
+        </script>
+    </body>
+
+</html>

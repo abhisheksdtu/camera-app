@@ -1,78 +1,125 @@
-let videoPlayer = document.getElementById('video-elem');
+let video = document.querySelector('video');
+let vidBtn = document.querySelector('button#record');
+let body = document.querySelector('body');
+let capBtn = document.querySelector('button#capture');
+let filters = document.querySelectorAll('.filters');
+let zoomin = document.querySelector('.zoom-in');
+let zoomout = document.querySelector('.zoom-out');
+let gallerybtn = document.querySelector('#gallery');
+let constraints = { video: true, audio: false };
+let mediaRecorder;
+let isRecording = false;
+let chunks = [];
 
-let videoRecordBtn = document.getElementById('record-video');
+let minzoom = 1;
+let maxzoom = 3;
+let currzoom = 1;
 
-let constraints = { audio: true, video: true };
+gallerybtn.addEventListener('click', function () {
+	location.assign('gallery.html');
+});
+let filter = '';
 
-let recordState = false;
-videoRecordBtn.addEventListener('click', function () {
-	if (mediaRecorder != undefined) {
-		if (recordState == false) {
-			recordState = true;
+for (let i = 0; i < filters.length; i++) {
+	filters[i].addEventListener('click', function (e) {
+		filter = e.currentTarget.style.backgroundColor;
+		removefilter();
+		applyfilter(filter);
+	});
+}
+zoomin.addEventListener('click', function () {
+	let videocurrscale = video.style.transform.split('(')[1].split(')')[0];
+	if (videocurrscale > maxzoom) {
+		return;
+	} else {
+		currzoom = Number(videocurrscale) + 0.1;
+		video.style.transform = `scale(${currzoom})`;
+	}
+});
+zoomout.addEventListener('click', function () {
+	if (currzoom > minzoom) {
+		currzoom -= 0.1;
+		video.style.transform = `scale(${currzoom})`;
+	}
+});
+vidBtn.addEventListener('click', function () {
+	let innerDiv = vidBtn.querySelector('div');
 
-			// STARTS RECORDING
-			mediaRecorder.start();
-			// WHEN RECORDING IS STARTED WE NEED TO CATCH THIS DATA
-			// THE DATA IS SENT INTO BLOB TYPE
-			// THIS DATA IS NOT SENT ALL AT ONCE
-			// SO THE BROWSER SENDS DATA IN TIME INTERVALS IN CHUNKS SO WE STORE IT IN AN ARRAY
-			// AND WE NEED TO COMBINE THIS DATA INTO ONE
-
-			videoRecordBtn.innerText = 'Recording...';
-		} else {
-			recordState = false;
-
-			// STOPS RECORDING
-			mediaRecorder.stop();
-
-			videoRecordBtn.innerText = 'Record';
-		}
+	if (isRecording) {
+		mediaRecorder.stop();
+		isRecording = false;
+		innerDiv.classList.remove('record-animation');
+	} else {
+		mediaRecorder.start();
+		filter = '';
+		removefilter();
+		isRecording = true;
+		innerDiv.classList.add('record-animation');
 	}
 });
 
-let chunks = [];
+capBtn.addEventListener('click', function () {
+	let innerDiv = capBtn.querySelector('div');
+	innerDiv.classList.add('capture-animation');
+	setTimeout(function () {
+		innerDiv.classList.remove('capture-animation');
+	}, 500);
+	capture();
+});
 
-let mediaRecorder;
+navigator.mediaDevices.getUserMedia(constraints).then(function (mediaStream) {
+	video.srcObject = mediaStream;
 
-navigator.mediaDevices
-	.getUserMedia(constraints)
-	.then(function (mediaStream) {
-		// audioPlayer.srcObject = mediaStream;
-		videoPlayer.srcObject = mediaStream;
+	mediaRecorder = new MediaRecorder(mediaStream);
 
-		// CREATED A MediaRecorder OBJECT IN WHICH WE PASS THE MEDIA STREAM FOR RECORDING
-		mediaRecorder = new MediaRecorder(mediaStream);
-
-		// EVERY WE GET CHUNK OF DATA WE PUSH IT IN chunks ARRAY
-		mediaRecorder.ondataavailable = function (e) {
-			chunks.push(e.data);
-		};
-
-		// WHEN THE CHUNK OF DATA STOPS COMING
-		mediaRecorder.onstop = function () {
-			// CREATE A NEW BLOB FROM CHUNKS
-			let blob = new Blob(chunks, { type: 'video/mp4' });
-
-			// EMPTY CHUNKS
-			chunks = [];
-
-			// DOWNLOAD THIS BLOB FILE
-
-			// CREATE A BLOB URL
-			let blobUrl = URL.createObjectURL(blob);
-
-			// CREATE LINK
-			let link = document.createElement('a');
-			// ADD HREF
-			link.href = blobUrl;
-			// GIVE FILE A NAME FOR DOWNLOADING
-			link.download = 'video.mp4';
-			// CLICK THE LINK
-			link.click();
-			// REMOVE THE ANCHOR ELEM
-			link.remove();
-		};
-	})
-	.catch(function (err) {
-		console.log(err);
+	mediaRecorder.addEventListener('dataavailable', function (e) {
+		chunks.push(e.data);
 	});
+
+	mediaRecorder.addEventListener('stop', function () {
+		let blob = new Blob(chunks, { type: 'video/mp4' });
+		addMedia('video', blob);
+		chunks = [];
+
+		let url = URL.createObjectURL(blob);
+
+		let a = document.createElement('a');
+		a.href = url;
+		a.download = 'video.mp4';
+		a.click();
+		a.remove();
+	});
+});
+
+function capture() {
+	let c = document.createElement('canvas');
+	c.width = video.videoWidth;
+	c.height = video.videoHeight;
+	let ctx = c.getContext('2d');
+
+	ctx.translate(c.width / 2, c.height / 2);
+	ctx.scale(currzoom, currzoom);
+	ctx.translate(-c.width / 2, -c.height / 2);
+
+	ctx.drawImage(video, 0, 0);
+	if (filter != '') {
+		ctx.fillStyle = filter;
+		ctx.fillRect(0, 0, c.width, c.height);
+	}
+	let a = document.createElement('a');
+	a.download = 'image.jpg';
+	a.href = c.toDataURL();
+	addMedia('img', c.toDataURL());
+	a.click();
+	a.remove();
+}
+function applyfilter(filterColor) {
+	let filterdiv = document.createElement('div');
+	filterdiv.classList.add('filter-div');
+	filterdiv.style.backgroundColor = filterColor;
+	body.appendChild(filterdiv);
+}
+function removefilter() {
+	let filterdiv = document.querySelector('.filter-div');
+	if (filterdiv) filterdiv.remove();
+}

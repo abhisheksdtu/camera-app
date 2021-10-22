@@ -1,0 +1,69 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+.container {
+    background-color: #e5e0db;
+    background-image: url("./pexels-photo-1166644.jpeg");
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    background-position: center;
+    padding: 30px;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+}
+
+.media-card {
+    height: 25rem;
+    width: 22rem;
+    margin-bottom: 10px;
+    border: 1px solid;
+}
+
+.media-container {
+    height: 80%;
+    width: 100%;
+}
+
+.action-container {
+    height: 20%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: aquamarine;
+}
+
+.imagee {
+    height: 5vw;
+    z-index: 4;
+    /* background: white; */
+    position: fixed;
+    margin: -2vw -6vw 2vw 0vw;
+}
+
+.action-container button {
+    width: 100%;
+    height: 50%;
+    color: white;
+    font-size: 1.5rem;
+    outline: none;
+    border: none;
+}
+
+.media-gallery {
+    height: 100%;
+    width: 100%;
+}
+
+.media-download {
+    height: 4vw;
+}
+
+.media-delete {
+    height: 4vw;
+}
